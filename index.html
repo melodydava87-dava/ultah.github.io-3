@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="id"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday My Love ❤️</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&amp;family=Dancing+Script:wght@600;700&amp;family=Montserrat:wght@300;400;500;600;700&amp;family=Poppins:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a0510 0%, #2a081a 35%, #3d0c26 70%, #15030d 100%);
+            color: #fce7f3;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .font-cursive {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .font-handwriting {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        .font-montserrat {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        /* Floating background canvas */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 182, 193, 0.18);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass-card-light {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 15px 35px rgba(225, 29, 72, 0.2);
+        }
+
+        /* Envelope Styles */
+        .envelope {
+            position: relative;
+            background: linear-gradient(135deg, #e11d48, #be123c);
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            transition: transform 0.6s ease;
+            cursor: pointer;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid #f43f5e;
+            transform-origin: top;
+            transition: transform 0.5s ease 0.2s, z-index 0.2s ease;
+            z-index: 3;
+        }
+
+        @media (min-width: 640px) {
+            .envelope-flap {
+                border-left-width: 220px;
+                border-right-width: 220px;
+                border-top-width: 140px;
+            }
+        }
+
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+
+        /* 3D Flip Card */
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Candle Flame Animation */
+        .flame {
+            width: 18px;
+            height: 28px;
+            background: linear-gradient(to bottom, #fef08a 0%, #f97316 60%, #ef4444 100%);
+            border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 15px #f97316, 0 0 30px #fef08a;
+            animation: flicker 0.1s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-1deg); opacity: 0.95; }
+            100% { transform: scale(1.08) rotate(1deg); opacity: 1; }
+        }
+
+        .flame.extinguished {
+            display: none;
+        }
+
+        .smoke {
+            display: none;
+            width: 8px;
+            height: 25px;
+            background: rgba(200, 200, 200, 0.6);
+            border-radius: 50%;
+            filter: blur(4px);
+            animation: rise 1.5s ease-out forwards;
+        }
+
+        @keyframes rise {
+            0% { transform: translateY(0) scaleX(1); opacity: 0.8; }
+            100% { transform: translateY(-40px) scaleX(2.5); opacity: 0; }
+        }
+
+        /* Audio Visualizer Wave Effect */
+        .audio-wave-bar {
+            width: 3px;
+            height: 16px;
+            background-color: #f43f5e;
+            border-radius: 3px;
+            animation: wave 1.2s ease-in-out infinite alternate;
+        }
+
+        .audio-wave-bar:nth-child(1) { animation-delay: 0.0s; }
+        .audio-wave-bar:nth-child(2) { animation-delay: 0.2s; }
+        .audio-wave-bar:nth-child(3) { animation-delay: 0.4s; }
+        .audio-wave-bar:nth-child(4) { animation-delay: 0.1s; }
+        .audio-wave-bar:nth-child(5) { animation-delay: 0.3s; }
+
+        @keyframes wave {
+            0% { height: 4px; }
+            100% { height: 22px; }
+        }
+
+        .paused .audio-wave-bar {
+            animation-play-state: paused;
+            height: 4px !important;
+        }
+
+        /* Glowing Pulse */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(244, 63, 94, 0.6); }
+            50% { box-shadow: 0 0 35px rgba(244, 63, 94, 1); }
+        }
+        .pulse-pink {
+            animation: pulse-glow 2s infinite;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen text-pink-50">
+
+    <!-- Background Canvas (Hearts & Petals) -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- FLOATING MUSIC PLAYER BAR -->
+    <div class="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex items-center gap-3 glass-card-light p-2.5 pr-4 rounded-full border border-rose-400/40 shadow-2xl">
+        <button id="mainPlayBtn" onclick="toggleAudio()" class="w-12 h-12 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 pulse-pink">
+            <i id="mainPlayIcon" class="fas fa-play text-lg translate-x-0.5"></i>
+        </button>
+
+        <div class="hidden sm:flex flex-col">
+            <span id="currentSongTitle" class="text-xs font-semibold text-rose-200 truncate max-w-[140px]">Melodi Cinta Romantis</span>
+            <div id="audioVisualizer" class="flex items-end gap-1 h-5 mt-0.5 paused">
+                <div class="audio-wave-bar"></div>
+                <div class="audio-wave-bar"></div>
+                <div class="audio-wave-bar"></div>
+                <div class="audio-wave-bar"></div>
+                <div class="audio-wave-bar"></div>
+            </div>
+        </div>
+
+        <button onclick="nextSong()" class="text-rose-300 hover:text-white p-2 transition-colors">
+            <i class="fas fa-step-forward text-sm"></i>
+        </button>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="relative z-10 max-w-5xl mx-auto px-4 py-8 space-y-24">
+
+        <!-- 1. HERO HEADER ROMANTIS -->
+        <section class="min-h-[90vh] flex flex-col justify-center items-center text-center space-y-6 pt-8">
+            <div class="inline-flex items-center gap-2 px-5 py-2 bg-rose-500/20 border border-rose-400/30 text-rose-300 rounded-full text-xs md:text-sm font-medium tracking-wide shadow-lg animate-bounce">
+                <span>✨ Hari Teristimewa Untukmu ✨</span>
+            </div>
+
+            <h1 class="text-4xl md:text-7xl font-montserrat font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-rose-300 via-pink-200 to-rose-400 leading-tight">Happy Birthday Sayang Iqna yaumi Fitri Yang Paling Comell
+</h1>
+
+            <p class="max-w-2xl text-rose-100/80 text-sm md:text-base leading-relaxed px-4 font-light">
+                Di hari yang indah ini, dunia merayakan kehadiran seseorang yang paling berharga di hidupku. Terima kasih telah membawa kehangatan, kebahagiaan, dan tawa di setiap hariku.
+            </p>
+
+            <!-- Countdown / Timer Anniversary -->
+            <div class="w-full max-w-lg glass-card rounded-3xl p-6 text-center border border-rose-300/20">
+                <h3 class="text-xs md:text-sm font-semibold text-rose-300 uppercase tracking-widest mb-4">Waktu Indah Bersamamu 💕</h3>
+                <div class="grid grid-cols-4 gap-3 text-center">
+                    <div class="bg-rose-950/50 p-3 md:p-4 rounded-2xl border border-rose-500/20">283
+                        Hari</div>
+                    <div class="bg-rose-950/50 p-3 md:p-4 rounded-2xl border border-rose-500/20">6792
+
+                        Jam</div>
+                    <div class="bg-rose-950/50 p-3 md:p-4 rounded-2xl border border-rose-500/20">407.520
+                        Menit</div>
+                    <div class="bg-rose-950/50 p-3 md:p-4 rounded-2xl border border-rose-500/20">24.451.200
+                        Detik</div>
+                </div>
+                <p class="text-xs text-rose-300/60 mt-4 italic">Sejak awal kisah cinta kita dimulai ✨</p>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <a href="#musicSection" class="pt-6 text-rose-400 hover:text-rose-300 transition-colors flex flex-col items-center group">
+                <span class="text-xs font-medium mb-1 tracking-wider opacity-80 group-hover:opacity-100">Dengarkan Musik &amp; Lanjutkan</span>
+                <i class="fas fa-chevron-down animate-bounce text-sm"></i>
+            </a>
+        </section>
+
+
+        <!-- 2. MUSIC PLAYER ROMANTIS LENGKAP -->
+        <section id="musicSection" class="scroll-mt-12 glass-card rounded-3xl p-6 md:p-10 border border-rose-500/20 relative overflow-hidden">
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-rose-500/10 rounded-full blur-3xl"></div>
+            
+            <div class="text-center mb-8">
+                <span class="text-xs uppercase tracking-widest text-rose-400 font-semibold">Romantic Playlist</span>
+                <h2 class="text-3xl md:text-4xl font-cursive text-rose-200 mt-1">Pemutar Musik Cinta</h2>
+                <p class="text-xs md:text-sm text-rose-100/70 mt-1">Pilih alunan nada romantis untuk menemani saat membaca ucapan ini</p>
+            </div>
+
+            <div class="grid md:grid-cols-12 gap-8 items-center">
+                <!-- Current Playing Vinyl Display -->
+                <div class="md:col-span-5 flex flex-col items-center text-center">
+                    <div class="relative w-44 h-44 md:w-52 md:h-52 rounded-full p-2 bg-gradient-to-tr from-rose-600 to-pink-400 shadow-2xl flex items-center justify-center">
+                        <div id="vinylDisc" class="w-full h-full bg-stone-900 rounded-full border-4 border-stone-800 flex items-center justify-center relative overflow-hidden transition-transform duration-700">
+                            <!-- Vinyl Grooves -->
+                            <div class="absolute inset-2 border border-stone-700/50 rounded-full"></div>
+                            <div class="absolute inset-6 border border-stone-700/50 rounded-full"></div>
+                            <div class="absolute inset-10 border border-stone-700/50 rounded-full"></div>
+                            <!-- Vinyl Center Label -->
+                            <div class="w-16 h-16 bg-rose-500 rounded-full border-4 border-stone-900 flex items-center justify-center z-10 shadow-inner">
+                                <i class="fas fa-heart text-white text-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 id="displaySongTitle" class="text-lg font-bold text-rose-200 mt-4">Melodi Akustik Ulang Tahun</h3>
+                    <p id="displaySongArtist" class="text-xs text-rose-300/70">Piano &amp; Acoustic Guitar</p>
+                </div>
+
+                <!-- Playlist Selection & Controls -->
+                <div class="md:col-span-7 space-y-4">
+                    <div class="space-y-2">
+                        <!-- Song 1 -->
+                        <div onclick="selectSong(0)" id="song-0" class="song-item p-3.5 rounded-2xl bg-rose-500/20 border border-rose-400/30 flex items-center justify-between cursor-pointer hover:bg-rose-500/30 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-rose-500/30 flex items-center justify-center text-rose-300">
+                                    <i class="fas fa-music text-xs"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-rose-100">Melodi Akustik Ulang Tahun</h4>
+                                    <p class="text-[11px] text-rose-300/70">Piano &amp; Guitar Soft Harmony</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-rose-400 font-mono">03:45</span>
+                        </div>
+
+                        <!-- Song 2 -->
+                        <div onclick="selectSong(1)" id="song-1" class="song-item p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between cursor-pointer hover:bg-rose-500/20 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-300">
+                                    <i class="fas fa-heart text-xs"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-rose-100">Cinta Tanpa Syarat (Piano Solo)</h4>
+                                    <p class="text-[11px] text-rose-300/70">Romantic Piano Ballad</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-rose-400 font-mono">04:12</span>
+                        </div>
+
+                        <!-- Song 3 -->
+                        <div onclick="selectSong(2)" id="song-2" class="song-item p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between cursor-pointer hover:bg-rose-500/20 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-rose-500/20 flex items-center justify-center text-rose-300">
+                                    <i class="fas fa-star text-xs"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-semibold text-rose-100">Kisah Indah Bersamamu</h4>
+                                    <p class="text-[11px] text-rose-300/70">Gentle Strings &amp; Orchestra</p>
+                                </div>
+                            </div>
+                            <span class="text-xs text-rose-400 font-mono">03:20</span>
+                        </div>
+                    </div>
+
+                    <!-- Audio Controls Bar -->
+                    <div class="pt-4 flex items-center justify-between border-t border-rose-500/20">
+                        <div class="flex items-center gap-4">
+                            <button onclick="prevSong()" class="text-rose-300 hover:text-white transition">
+                                <i class="fas fa-step-backward text-lg"></i>
+                            </button>
+                            <button onclick="toggleAudio()" class="w-12 h-12 bg-rose-500 hover:bg-rose-600 text-white rounded-full flex items-center justify-center shadow-lg transition">
+                                <i id="playerPlayIcon" class="fas fa-play text-base translate-x-0.5"></i>
+                            </button>
+                            <button onclick="nextSong()" class="text-rose-300 hover:text-white transition">
+                                <i class="fas fa-step-forward text-lg"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2 text-rose-300/80 text-xs">
+                            <i class="fas fa-volume-up"></i>
+                            <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="0.8" onchange="adjustVolume(this.value)" class="w-20 accent-rose-500 cursor-pointer">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 3. TIUP LILIN & MAKE A WISH INTERAKTIF -->
+        <section class="glass-card rounded-3xl p-6 md:p-10 border border-rose-500/20 text-center space-y-6">
+            <div class="space-y-2">
+                <span class="text-xs uppercase tracking-widest text-rose-400 font-semibold">Make a Birthday Wish</span>
+                <h2 class="text-3xl md:text-4xl font-cursive text-rose-200">Tiup Lilin Ulang Tahun</h2>
+                <p class="text-xs md:text-sm text-rose-100/70">Klik / tap lilin di bawah untuk memadamkan apinya &amp; panjatkan doamu ✨</p>
+            </div>
+
+            <!-- Cake Display -->
+            <div class="py-6 flex flex-col items-center justify-center">
+                <div class="relative cursor-pointer group" onclick="blowCandle()">
+                    <!-- Candle Flame & Smoke -->
+                    <div class="absolute -top-7 left-1/2 -translate-x-1/2 flex flex-col items-center z-20">
+                        <div id="candleFlame" class="flame"></div>
+                        <div id="candleSmoke" class="smoke"></div>
+                    </div>
+                    <!-- Candle Body -->
+                    <div class="w-5 h-14 bg-gradient-to-b from-rose-200 via-pink-300 to-rose-400 rounded-t-sm border border-rose-300/50 shadow-md mx-auto relative z-10">
+                        <div class="w-full h-2 bg-rose-400/40 my-2"></div>
+                        <div class="w-full h-2 bg-rose-400/40"></div>
+                    </div>
+                    <!-- Cake Top & Base -->
+                    <div class="w-36 md:w-48 h-12 bg-gradient-to-r from-pink-400 via-rose-300 to-pink-400 rounded-t-2xl border-t-2 border-white/40 shadow-inner relative z-0 flex items-center justify-center">
+                        <span class="text-xs font-serif text-rose-900 font-bold">Happy Birthday</span>
+                    </div>
+                    <div class="w-44 md:w-56 h-14 bg-gradient-to-r from-rose-800 via-rose-700 to-rose-800 rounded-b-2xl border-b-4 border-rose-900 shadow-2xl flex items-center justify-center">
+                        <div class="flex gap-2">
+                            <span class="text-xs">🍓</span>
+                            <span class="text-xs">🍓</span>
+                            <span class="text-xs">🍓</span>
+                        </div>
+                    </div>
+                    <!-- Plate -->
+                    <div class="w-52 md:w-64 h-3 bg-stone-300/80 rounded-full mx-auto shadow-xl"></div>
+                </div>
+            </div>
+
+            <!-- Make a Wish Box (Revealed after blowing candle) -->
+            <div id="wishRevealedBox" class="hidden max-w-md mx-auto p-5 bg-rose-500/20 border border-rose-400/30 rounded-2xl animate-fade-in space-y-3">
+                <p class="text-sm font-semibold text-rose-200">✨ semoga allah berikan apa yang kamu doakan ya sayang ✨</p>
+                <form id="wishForm" onsubmit="saveWish(event)" class="space-y-3">
+                    <input type="text" id="wishInput" required="" placeholder="Tuliskan harapan terbesarmu tahun ini..." class="w-full px-4 py-2.5 rounded-xl bg-black/30 border border-rose-400/30 text-rose-100 placeholder-rose-300/40 text-xs focus:outline-none focus:border-rose-400">
+                    <button type="submit" class="w-full py-2.5 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white rounded-xl text-xs font-semibold transition shadow-md">
+                        Simpan &amp; Kirim Harapan ❤️
+                    </button>
+                </form>
+                <p id="wishSavedMsg" class="hidden text-xs text-rose-300 font-medium">❤ Harapanmu sudah tersimpan aman di hatiku sayang!</p>
+            </div>
+        </section>
+
+
+        <!-- 4. SURAT CINTA INTERAKTIF DALAM AMPLOP 3D -->
+        <section class="flex flex-col items-center text-center space-y-8">
+            <div>
+                <span class="text-xs uppercase tracking-widest text-rose-400 font-semibold">Message From My Heart</span>
+                <h2 class="text-3xl md:text-4xl font-cursive text-rose-200 mt-1">Surat Cinta Spesial dari aku sayang </h2>
+                <p class="text-xs md:text-sm text-rose-100/70 mt-1">Sentuh amplop di bawah ini untuk membuka dan membaca pesanku</p>
+            </div>
+
+            <!-- Envelope Container -->
+            <div class="w-full max-w-lg flex justify-center py-4">
+                <div id="envelope" onclick="openEnvelope()" class="envelope w-[300px] sm:w-[440px] h-[200px] sm:h-[260px] flex items-end justify-center p-4">
+                    <div class="envelope-flap"></div>
+                    <div class="text-center text-white font-medium z-10 mb-6 pointer-events-none">
+                        <i class="fas fa-heart text-4xl text-rose-200 drop-shadow-md animate-pulse"></i>
+                        <p class="mt-2 text-xs md:text-sm text-white font-semibold bg-black/40 px-4 py-1.5 rounded-full backdrop-blur-md">Klik Untuk Membuka Surat</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Letter Content Modal -->
+            <div id="letterModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-gradient-to-b from-stone-900 to-rose-950 max-w-2xl w-full max-h-[85vh] overflow-y-auto rounded-3xl p-6 md:p-10 border border-rose-500/30 shadow-2xl relative text-rose-100">
+                    <button onclick="closeEnvelope()" class="absolute top-4 right-4 w-9 h-9 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-full flex items-center justify-center transition">
+                        <i class="fas fa-times text-base"></i>
+                    </button>
+                    
+                    <div class="text-center mb-6">
+                        <i class="fas fa-heart text-rose-500 text-3xl mb-2"></i>
+                        <h3 class="text-3xl font-cursive text-rose-300">Untuk Cintaku Tersayang,</h3>
+                    </div>
+
+                    <div class="space-y-4 font-montserrat text-xs md:text-sm leading-relaxed text-rose-100/90 font-light">
+                        <p>Hari ini adalah hari yang sangat spesial karena di hari inilah sosok yang paling berarti dalam hidupku dilahirkan. I am so grateful to have you in my life, and every single day with you feels like a beautiful gift.
+
+Terima kasih ya sudah selalu ada, memberikan cinta, tawa, dan kehangatan di setiap hariku. You make my world so much brighter just by being yourself. Aku berharap di usiamu yang baru ini, kamu selalu diberikan kebahagiaan, kesehatan, dan kemudahan dalam meraih semua mimpi-mimpimu.
+
+I wish you all the happiness in the world because you truly deserve it. Semoga hubungan kita juga bisa semakin dewasa, makin erat, dan terus berjalan berdampingan melewati setiap musim kehidupan.
+
+Happy Birthday, my love! I love you so much, today and always. ❤️&nbsp;</p>
+                        <p>
+                            Melihatmu tumbuh, tersenyum, dan berjuang setiap hari adalah salah satu kebahagiaan terbesar dalam hidupku. Terima kasih telah hadir dengan segala kebaikan, kesabaran, dan ketulusan hatimu.
+                        </p>
+                        <p>
+                            Di usiamu yang baru ini, doaku selalu menyertaimu:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1.5 pl-2 text-rose-300 italic">
+                            <li>Semoga langkahmu selalu dimudahkan dalam meraih setiap impian.</li>
+                            <li>Semoga senyum bahagiamu tak pernah pudar oleh situasi apapun.</li>
+                            <li>Semoga hubungan kita selalu dipenuhi rasa saling mengerti dan cinta yang bertambah setiap hari dan apa yg kita impikan bisa kita gapai ya sayang</li>
+                        </ul>
+                        <p>Aku berjanji akan selalu ada di sisimu, mendukungmu di saat senang maupun sulit, dan terus mencintaimu apa adanya, I LOVE MORE AND MORE SAYANG</p>
+                        <p class="text-right font-handwriting text-2xl text-rose-400 pt-4">
+                            Dengan segenap cintaku,<br>
+                            ❤ Pasanganmu yang Selalu Mencintaimu
+                        </p>
+                    </div>
+
+                    <div class="mt-8 text-center">
+                        <button onclick="closeEnvelope()" class="px-6 py-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full text-xs font-semibold transition shadow-lg">
+                            Simpan di Dalam Hati 💕
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 5. TIMELINE KENANGAN / MEMORY LANE -->
+        <section class="space-y-8">
+            <div class="text-center">
+                <span class="text-xs uppercase tracking-widest text-rose-400 font-semibold">Our Journey</span>
+                <h2 class="text-3xl md:text-4xl font-cursive text-rose-200 mt-1">Garis Waktu Perjalanan Cinta</h2>
+                <p class="text-xs md:text-sm text-rose-100/70 mt-1">Momen-momen berharga yang membangun kisah kita</p>
+            </div>
+
+            <div class="relative border-l-2 border-rose-500/30 ml-4 md:ml-1/2 md:-translate-x-1/2 space-y-8 max-w-3xl mx-auto">
+                <!-- Timeline Item 1 -->
+                <div class="relative pl-8 md:pl-0 group">
+                    <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-rose-500 border-4 border-stone-900 group-hover:scale-125 transition-transform"></div>
+                    <div class="glass-card p-5 rounded-2xl md:w-[45%] md:ml-auto">
+                        <span class="text-[10px] font-bold text-rose-400 uppercase tracking-wider">Awal Bertemu</span>
+                        <h4 class="text-sm font-semibold text-rose-100 mt-0.5">Pertemuan Pertama yang Tak Terlupakan</h4>
+                        <p class="text-xs text-rose-100/70 mt-2">Awal dari segalanya, saat mata kita pertama kali bertemu dan rasa penasaran indah mulai tumbuh.</p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 2 -->
+                <div class="relative pl-8 md:pl-0 group">
+                    <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-pink-500 border-4 border-stone-900 group-hover:scale-125 transition-transform"></div>
+                    <div class="glass-card p-5 rounded-2xl md:w-[45%] md:mr-auto md:text-right">
+                        <span class="text-[10px] font-bold text-rose-400 uppercase tracking-wider">Kencan Pertama</span>
+                        <h4 class="text-sm font-semibold text-rose-100 mt-0.5">Canggung Tapi Sangat Manis</h4>
+                        <p class="text-xs text-rose-100/70 mt-2">Di kopken Duduk berdua ditemani dua sodara kmu bercerita hingga lupa waktu, dan menyadari bahwa kita memiliki banyak kesamaan.</p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 3 -->
+                <div class="relative pl-8 md:pl-0 group">
+                    <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-rose-500 border-4 border-stone-900 group-hover:scale-125 transition-transform"></div>
+                    <div class="glass-card p-5 rounded-2xl md:w-[45%] md:ml-auto">
+                        <span class="text-[10px] font-bold text-rose-400 uppercase tracking-wider">Resmi Bersama</span>
+                        <h4 class="text-sm font-semibold text-rose-100 mt-0.5">Hari Kita Memulai Perjalanan Ini</h4>
+                        <p class="text-xs text-rose-100/70 mt-2">Momen saling mengucap janji untuk saling menjaga, menyayangi, dan melangkah bersama di tanggal 24.12.2025 tanggal yang selalu kita ingat untuk selamanya</p>
+                    </div>
+                </div>
+
+                <!-- Timeline Item 4 -->
+                <div class="relative pl-8 md:pl-0 group">
+                    <div class="absolute -left-[9px] top-1 w-4 h-4 rounded-full bg-pink-500 border-4 border-stone-900 group-hover:scale-125 transition-transform"></div>
+                    <div class="glass-card p-5 rounded-2xl md:w-[45%] md:mr-auto md:text-right">
+                        <span class="text-[10px] font-bold text-rose-400 uppercase tracking-wider">Hari Ini</span>
+                        <h4 class="text-sm font-semibold text-rose-100 mt-0.5">Ulang Tahunmu yang Bahagia</h4>
+                        <p class="text-xs text-rose-100/70 mt-2">Merayakan harimu dan bersiap mengukir ribuan kenangan manis baru di masa depan.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 6. GALERI FOTO KENANGAN -->
+        <section class="space-y-8">
+            <div class="text-center">
+                <span class="text-xs uppercase tracking-widest text-rose-400 font-semibold">Sweet Memories</span>
+                <h2 class="text-3xl md:text-4xl font-cursive text-rose-200 mt-1">Galeri Foto Kenangan</h2>
+                <p class="text-xs md:text-sm text-rose-100/70 mt-1">Klik foto untuk melihat dalam ukuran penuh</p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <!-- Gallery Item 1 -->
+                <div class="glass-card p-2 rounded-2xl cursor-pointer group overflow-hidden" onclick="openLightbox('https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&amp;w=800', 'Momen Manis Kencan Pertama ❤️')">
+                    <div class="relative aspect-square rounded-xl overflow-hidden">
+                        <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAYGBgYHBgcICAcKCwoLCg8ODAwODxYQERAREBYiFRkVFRkVIh4kHhweJB42KiYmKjY+NDI0PkxERExfWl98fKcBBgYGBgcGBwgIBwoLCgsKDw4MDA4PFhAREBEQFiIVGRUVGRUiHiQeHB4kHjYqJiYqNj40MjQ+TERETF9aX3x8p//CABEIBD4FqAMBIgACEQEDEQH/xAAxAAADAQEBAQAAAAAAAAAAAAAAAQIDBAUGAQEBAQEBAQAAAAAAAAAAAAAAAQIDBAX/2gAMAwEAAhADEAAAAvIA4/QaFVOWgIGIAAQAAK2gAS0IQYCGCCl09ON9ciw1zYFgFCbaQMClSFS0YxBpiYIgBiajQjQAAAIpyxiYAIAAAAMQwABiYxUAsqrOqIqgQxAAAAAAAABiATQxAwAAEBAAICgEMGIYJjEwEMEDEmgTCSkDGIAJoEMEMoGQhoBghggZKpAANwxpiqpcZ49HM6Lz+3knbz2Tz7MTBpj7/Puz6B8vZvysk1z+YTXH2gCgCMAE0MAAFEwE0MEMTBpg1Sz0133L0jTfAGrBu0kYJiQYBSEKTQaYAAIKBDAASKJYNAAhuQsloxA3LRiBuQoTRgxAqpSxKgAAAAAABDBDBNA0AAAADlgANANAAAgBDAY6AIAAAAAE0AIaYIaAAABiBgUAABADEAAIAYgBDBJggRQnKufozaww2wnfy5qefoTGg0A5adHtfPdese2ZG/N82w5etDQAAAA0o0DBDQ1ExE0wBiZQdtdOsmjvXKLRchbQTESoBNDaEYmAwAEGgaYAIYkAJWIKJCkgYgokNDNpTgSiczZ8eVno15oekuTU2eegwJACgABoAAAENA0DQAJgmgAAAYgYmJoAAAQMYNMAAAAAQAAAAAIAABA0wApiBicAAAAACYJgAAJghkJMJbSzOsS8/J0cr0edLXPu0NBCG5Y6TNALnERK5aUAGmgAAABoABiYAAAPs4/Ts30jXXGg0uM7qbAGCagTKEwAaCYDBAAAQxCsQAIAFQwEAOYLXJxWepyeViz6eXAmfQ18pnr8XMGqhG984eh1eN0V7Wvlh7deV3xsTQ3LGgAAAAQAAAAAgTAAAABoAAAAQDGJpgNDEwTQwBAgaY0AAgAEADAAKAAAGBAAAAAAAAOENAAAAJoJpLyYdOU7+NNTz9CBiVJVSaV0dvfrlBuXh8omY9aABDUAAGJiGmgAAABMAY/V8r0Lnu0i98LsGE07JViwWiSgSoEwGmkBgIStNAwExCKCSgktGZPmHX5vNz3O2UtkGoTENy6QOECG4Zo5dPTDU39XwmfSHg9Ne/XPtFOQoQAAAACGJiAGmgAAAAAABNADG0ABQ0A0Q0mAAACYCGgAAGIAAAAsAFABicAAxMAATBNMAIQwQAACGHNxej5c9Hnz11nvxHao430M5tOvpZ7dIx15ug8Ib4AWPRQA0CgADkYIaGCYJoGAAA+3i9K59C87359BK5sVIRNFFJpRIGCGACYIYIbWRiDQNAMSgDI04uDz7OjjSuUFwnQQ2ElIbljSBK1LLbsGMkKFNAaxNez6fy/qHsvm3WgUUIRoKAAAAAaGAAmmIYIYIGJgDAQAAAAAAAAmgAGCGJiAAAAAAAAAAaBiYADEwAAAAIAATBAAMM+Tp5r0mdN5vkvvbOGlqYE8onnvHPVGQ35IE6jABiyNDEDQAADQAAwAEzX2PP9LXO9INcdENC0M2SwECaaiEMQDQAANIoljQDBBM8xp5OPNcECQCh6VUuZUqinZlNCS25ZnWC53ma53c2U5uxTcomMU3IUor1fW+X7T6J8nTLQmMQMTsTAGgYmJgAAAAAA0AADQAAAAmJgCYIYIaAEMQMTBNA0DEwABoGAAAAADAYIaAAEwTCEwBoENqhghoE4lmeXpxvLn6PPnXjGXrg6UIYoqBKmQWLCYiGKAIA1lgjGHq9OW+uFiNYdzSNy2RoEMUJBiAEwaFBIpJjExiUjlZLHlbebcLO4uSiybdytbc80s9Nk5tNCoemkuD6Jl5N9Olca3M68/P0MtZ5cfQxTmeuOstWrFOiJm0Za5Oz2vS+b9eX0ayuWhNGJ0NCMCgGJgAAAgaCkAAxAAAAAxA0AIAAAaBMEwAAAAAExiGCGADENCYA0xUgYAAACGgAATCAFKqdGE7i5Z655153bPXnXDh2Q14wjfTIDn1rpy9Kzkj1Ux5Z6aXzT08zz8/ShfMn0eded7DWBqjM1zFc6J6u2W+vOOb1huRKAkpDEAOKmhuQQ1EyEAJjAENERHPrwHHgzXNKlT2z2lHq86pXc1FslFVSy6owfQzKtKINEZxuVzc/dlZy8fr8dznj2Y2czWlzje2JlG2dy9+dn0u3jevnerixtFywKGmDQgJgBQAAAwABDloGIYgYAAhgAmCAAAaGAAAAwAGIYIGAAJghoAYmAxMAAAEMENANA04YgYmABKtS8s7GOngnsl382Bj07+p4/o3Pq3nprxgFhNBll1Ka48fSib86PQyb5MvQJvz8/Si3za61Na9OWmuFUVeaNBJGyaYklyJWiSgzNGub0EyejMasM1pERltzzWPm9/lpjNR05tzUuu+XVNaO1japuVDcoy1HVE03Ym2IYQWzONSzLm64Obm7sdTh7r1Obj78I8xdmG8YRrFxv7/AM57U126Y6Z1VTVyxOxpBSABA3LsYimIGElKQokKJY2mIaGAAAAAmAAAAAAADTAAABgAAJgCYIAYAAAwBVIAAJgCBgMAABoQxENBLmWTXyTRj3V2cfRL63X5voa8tES5amdlCKZLQKKzndLzm6lyy7EuD1EjRu5ChM3YStESUVBYQ6CRghghgJomLnNy5+jmzrDyPW8jUzlm8O50l16+Trz01uaxoKJQKVUMdzVlNUJjsBghhKpmZaOe6ZmrRnltkYYdmNnDGuG+a9Lzeuz27w259Nal3LEWApV1kjUzLNSOfU658TjT3+HyEnqR5knprzkegcBXrdHguX6XT5Wz66/l+09t8PYtAIxAxAwAABpiYgaBiYNMAQNA0AAAAMAAAAAENAAAAA5ChAxMAAEQ0JWIPlEzl9BXLl9Lv8n07x3z0znFPIa6b5tbnUVaxOmbS6TsQwRQSUCGWJgAADBDBDBAAAJgIaENLMXGbly9PNnXP5PqeXqZjvWZtqXXr5evO9ams7dS4bTVtUFp1TTR3NWAAIBiBTUyoJCakmakzw2izgw6OfpyW/PtZ7euOvPrvWVXLEhwZLWUZnTz+by759vNnpZmJDUkMkGJgCG0BSAAqurjR7/p/H9x9OcfUWIGIGgGJgAAAxAxAxMAATQxAwAEDEDEAANCGgGIGAMQNAAmE0pUIr5YZw+i9crXq9Dh7nHfPTFwbxtulco9sXZ1LPbXMc1cjTGBYAAAAAAxMAAEAAwQMQwQAk5VRcZuXN04Z1w+d6Xl6yrjXRlma+vn6s7phnTpNW5RdZ2lVFVTll0iykwSaABUmokaFFyTNwZzplXn8/RjvlOmW+s+xplpz67POkpTIYXy1HnGWubSLKkABksQk0AMTAABiolVIMQ3LNPW8Wq+v1+e9pegkKJaDTBoAAABiBiYAxAAmhiIYgAAaBNCsQACAAMAAABQCwaQ5EqAX5o2nh9BXe5Pdz9WuPRntE4ci0zz1GJdr56ud7x21z2eemsMGgBYAAAAwTQAwTBUwRDBDSgIaEATBFKXDLbLOuHyvU8reTXLYsrfO3snnTYAk1GIqoqtHkRu8rNKi6oBBIBBKIBIAm5Ii4WM9cE48N+bpynfn6rPT1zvPTR5kXicqV5b5982K7AbIWiJbqWFaJKZmWGa0lIKdJgJUhDCWMSaK9PymfX6/P+5bsSxgINMAAYhpoAQwStIGIGBA0wAAAQ1QmoABiaAAAKE0AFAMlVIgJeA6b4+nzd+nO5el6XIxueGPYs74p685vC7Q9FprFaZaaxbl3I07AAABpgmgYAhigIAAEAJQ0AgSk0oxnTKXzPP7uLUWmei79Ge2OjpEObCWxSlZRTM42kzvOl20ytNJcopJUEACqiaRmblJpEYdGJw4a5dOWXfw+hrPc08dISmM/L15N4oauUOxW9ZrM3I53u1556IMi2TGoZLUMFqrM22krQMS5SWOpTBDRXq+RpX1unl+orYINMABoATSiYAAhoGENAAmDEMTQEKJgDSAwTGJUlQAAA0xTUiJFx6YfPdzoJjo5jQTsGmibdTOgZGoZOwbmrGIGCsYnAAACgA00AAgAQCTBAAhKCUTykZ3xcvdw6meuWidenuenOiZ3p23jXp2I+f00
+[cite: 1]```
